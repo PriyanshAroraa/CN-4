@@ -1,0 +1,74 @@
+import sys
+
+class Graph:
+    def __init__(self, vertices):
+        self.V = vertices
+        self.graph = [[0 for _ in range(vertices)] for _ in range(vertices)]
+
+    def add_edge(self, u, v, weight):
+        self.graph[u][v] = weight
+        self.graph[v][u] = weight  # Undirected graph
+
+    def print_solution(self, dist):
+        print("Vertex \t Distance from Source")
+        for node in range(self.V):
+            print(f"{node} \t\t {dist[node]}")
+
+    def min_distance(self, dist, spt_set):
+        min_val = sys.maxsize
+        min_index = -1
+
+        for v in range(self.V):
+            if dist[v] < min_val and not spt_set[v]:
+                min_val = dist[v]
+                min_index = v
+        return min_index
+
+    def dijkstra(self, src):
+        dist = [sys.maxsize] * self.V
+        dist[src] = 0
+        spt_set = [False] * self.V
+
+        for _ in range(self.V):
+            u = self.min_distance(dist, spt_set)
+            spt_set[u] = True
+
+            for v in range(self.V):
+                if self.graph[u][v] > 0 and not spt_set[v] and dist[v] > dist[u] + self.graph[u][v]:
+                    dist[v] = dist[u] + self.graph[u][v]
+
+        self.print_solution(dist)
+
+    def distance_vector(self, src):
+        distance_vector = [sys.maxsize] * self.V
+        distance_vector[src] = 0
+        updated = True
+
+        while updated:
+            updated = False
+            for u in range(self.V):
+                for v in range(self.V):
+                    if self.graph[u][v] > 0:
+                        if distance_vector[v] > distance_vector[u] + self.graph[u][v]:
+                            distance_vector[v] = distance_vector[u] + self.graph[u][v]
+                            updated = True
+
+        self.print_solution(distance_vector)
+
+
+if __name__ == "__main__":
+    g = Graph(5)
+    g.add_edge(0, 1, 10)
+    g.add_edge(0, 4, 5)
+    g.add_edge(1, 2, 1)
+    g.add_edge(1, 4, 2)
+    g.add_edge(2, 3, 4)
+    g.add_edge(3, 4, 7)
+    g.add_edge(3, 2, 3)
+    g.add_edge(4, 3, 2)
+
+    print("Dijkstra's Algorithm (Link-State Routing):")
+    g.dijkstra(0)
+
+    print("\nDistance Vector Routing:")
+    g.distance_vector(0)
